@@ -165,6 +165,7 @@ public class GamePanel extends JPanel implements ActionListener {
         // Reset the score
         applesEaten = 0;
 
+
         // Create a new apple
         newApple();
 

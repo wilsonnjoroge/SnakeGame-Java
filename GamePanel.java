@@ -40,26 +40,40 @@ public class GamePanel extends JPanel implements ActionListener {
         super.paintComponent(g);
         draw(g);
     }
-    public void draw(Graphics g){
-
-        for (int i = 0; i<SCREEN_HEIGHT/UNIT_SIZE; i++){
-            g.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE, SCREEN_HEIGHT);
-            g.drawLine(0, i*UNIT_SIZE, SCREEN_WIDTH, i*UNIT_SIZE);
-        }
-        g.setColor(Color.RED);
-        g.fillOval(applex,appley,UNIT_SIZE,UNIT_SIZE);
-
-        for(int i = 0; i<bodyParts; i++){
-            if(i == 0){
-                g.setColor(Color.GREEN);
-                g.fillRect(x[i], y[i],UNIT_SIZE, UNIT_SIZE);
+    public void draw(Graphics g) {
+        if (running) {
+            // Draw grid lines (optional)
+            for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
+                g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
+                g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
             }
-            else{
-                g.setColor(new Color(45,180,0));
-                g.fillRect(x[i], y[i], UNIT_SIZE,UNIT_SIZE);
+
+            // Draw the apple
+            g.setColor(Color.RED);
+            g.fillOval(applex, appley, UNIT_SIZE, UNIT_SIZE);
+
+            // Draw the snake
+            for (int i = 0; i < bodyParts; i++) {
+                if (i == 0) {
+                    g.setColor(Color.GREEN); // Head
+                } else {
+                    g.setColor(new Color(45, 180, 0)); // Body
+                }
+                g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
             }
+
+            // Display the score
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Ink Free", Font.BOLD, 40));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten)) / 2, g.getFont().getSize());
+
+        } else {
+            // Call the gameOver method when the game is not running
+            gameOver(g);
         }
     }
+
     public void  newApple(){
         applex = random.nextInt((int)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE;
         appley = random.nextInt((int)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE;
@@ -115,17 +129,54 @@ public class GamePanel extends JPanel implements ActionListener {
             timer.stop();
         }
 
+        if (x[0] >= SCREEN_WIDTH || x[0] < 0 || y[0] >= SCREEN_HEIGHT || y[0] < 0) {
+            running = false;
+        }
+
+
     }
-    public void gameOver(Graphics g){
-        if(!running){
-            g.setColor(Color.RED);
-            g.fillRect(200,300,100,25);
+    public void gameOver(Graphics g) {
+        // Draw Game Over text
+        g.setColor(Color.RED);
+        g.setFont(new Font("Ink Free", Font.BOLD, 75));
+        FontMetrics metrics = getFontMetrics(g.getFont());
+        g.drawString("Game Over", (SCREEN_WIDTH - metrics.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
 
-          }
+        // Draw Score
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Ink Free", Font.BOLD, 40));
+        metrics = getFontMetrics(g.getFont());
+        g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten)) / 2, g.getFont().getSize());
+    }
+
+    public void restartGame() {
+        // Reset snake size and body parts
+        bodyParts = 6;
+
+        // Reset snake's initial position
+        for (int i = 0; i < bodyParts; i++) {
+            x[i] = 0;
+            y[i] = 0;
+        }
+
+        // Reset the direction of the snake
+        direction = 'R';
+
+        // Reset the score
+        applesEaten = 0;
+
+        // Create a new apple
+        newApple();
+
+        new GameFrame();
     }
 
 
-    @Override
+
+
+
+
+        @Override
     public void actionPerformed(ActionEvent e) {
 
             if (running){
@@ -140,6 +191,10 @@ public class GamePanel extends JPanel implements ActionListener {
     public class MyKeyAdapter extends KeyAdapter{
         @Override
         public void keyPressed(KeyEvent e){
+            if (!running && e.getKeyCode() == KeyEvent.VK_R) {
+                restartGame();
+            }
+
             switch (e.getKeyCode()){
                 case KeyEvent.VK_LEFT:
                     if(direction!='R'){

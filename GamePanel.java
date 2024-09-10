@@ -20,6 +20,7 @@ public class GamePanel extends JPanel implements ActionListener {
     int appley;
     char direction = 'R';
     boolean running = false;
+
     Timer timer;
     Random random;
     GamePanel(){

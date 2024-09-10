@@ -171,12 +171,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
         new GameFrame();
     }
-
-
-
-
-
-
         @Override
     public void actionPerformed(ActionEvent e) {
 
